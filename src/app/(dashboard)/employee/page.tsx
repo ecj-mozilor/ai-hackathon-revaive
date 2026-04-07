@@ -79,7 +79,6 @@ export default async function EmployeeDashboard() {
               Your personalised learning path is ready to be generated.
             </p>
             <GeneratePathButton />
-            <p className="mt-3 text-xs text-zinc-400">This usually takes 5–10 seconds.</p>
           </div>
         </div>
       )}

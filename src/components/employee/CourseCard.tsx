@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ExternalLink, PlayCircle, CheckCircle2 } from "lucide-react"
+import { ExternalLink, PlayCircle, CheckCircle2, Undo2 } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { useProgressStore } from "@/store/progressStore"
@@ -125,16 +125,42 @@ export function CourseCard({ resource }: CourseCardProps) {
           )}
 
           {isInProgress && (
-            <button
-              type="button"
-              onClick={() => updateStatus("COMPLETED")}
-              disabled={updating}
-              className="inline-flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-1 text-xs font-medium text-white hover:bg-indigo-700 transition-colors disabled:opacity-50"
-            >
-              <CheckCircle2 className="size-3" />
-              Mark Complete
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => updateStatus("COMPLETED")}
+                disabled={updating}
+                className="inline-flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-1 text-xs font-medium text-white hover:bg-indigo-700 transition-colors disabled:opacity-50"
+              >
+                <CheckCircle2 className="size-3" />
+                Mark Complete
+              </button>
+              <button
+                type="button"
+                onClick={() => updateStatus("PENDING")}
+                disabled={updating}
+                className="inline-flex items-center gap-1 px-2 py-1 text-xs text-zinc-400 hover:text-zinc-600 transition-colors disabled:opacity-50"
+              >
+                <Undo2 className="size-3" />
+                Undo
+              </button>
+            </>
           )}
+        </div>
+      )}
+
+      {/* Undo from completed */}
+      {isCompleted && (
+        <div className="flex items-center">
+          <button
+            type="button"
+            onClick={() => updateStatus("IN_PROGRESS")}
+            disabled={updating}
+            className="inline-flex items-center gap-1 px-2 py-1 text-xs text-zinc-400 hover:text-zinc-600 transition-colors disabled:opacity-50"
+          >
+            <Undo2 className="size-3" />
+            Undo
+          </button>
         </div>
       )}
     </div>

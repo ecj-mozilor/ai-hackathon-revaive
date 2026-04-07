@@ -16,7 +16,7 @@ export async function PATCH(req: NextRequest) {
       return Response.json({ success: false, error: "Forbidden" }, { status: 403 })
 
     const { resourceId, status } = body
-    if (!resourceId || !["IN_PROGRESS", "COMPLETED"].includes(status))
+    if (!resourceId || !["PENDING", "IN_PROGRESS", "COMPLETED"].includes(status))
       return Response.json({ success: false, error: "Invalid request" }, { status: 400 })
 
     const resource = await prisma.resource.findUnique({
