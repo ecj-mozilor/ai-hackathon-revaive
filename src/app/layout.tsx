@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SkillPath",
+  title: "FutureYou",
   description: "Personalised learning paths for your team",
 };
 

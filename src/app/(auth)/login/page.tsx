@@ -38,7 +38,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-zinc-50 flex items-center justify-center px-4">
       <div className="bg-white rounded-xl shadow-sm p-8 w-full max-w-md">
         <div className="mb-8 text-center">
-          <span className="text-2xl font-bold text-indigo-600 tracking-tight">SkillPath</span>
+          <span className="text-2xl font-bold text-indigo-600 tracking-tight">FutureYou</span>
           <p className="mt-2 text-sm text-zinc-500">Sign in to your account</p>
         </div>
 
