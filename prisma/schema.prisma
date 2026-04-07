@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                    String                 @id @default(cuid())
+  name                  String
+  email                 String                 @unique
+  role                  Role                   @default(EMPLOYEE)
+  mentorId              String?
+  mentor                User?                  @relation("MentorEmployee", fields: [mentorId], references: [id])
+  reportees             User[]                 @relation("MentorEmployee")
+  questionnaire         QuestionnaireResponse?
+  learningPath          LearningPath?
+  mentorInitialFeedback MentorInitialFeedback[] @relation("MentorGiven")
+  receivedFeedback      MentorInitialFeedback? @relation("EmployeeReceived")
+  quarterlyFeedbacks    QuarterlyFeedback[]
+}
+
+enum Role {
+  EMPLOYEE
+  MENTOR
+}
+
+model QuestionnaireResponse {
+  id             String              @id @default(cuid())
+  userId         String              @unique
+  user           User                @relation(fields: [userId], references: [id])
+  designation    String
+  experience     Int
+  skills         Json
+  careerGoal     String
+  learningFormat String[]
+  hoursPerWeek   Int
+  status         QuestionnaireStatus @default(AWAITING_MENTOR)
+  createdAt      DateTime            @default(now())
+}
+
+enum QuestionnaireStatus {
+  AWAITING_MENTOR
+  READY_FOR_GENERATION
+  GENERATED
+}
+
+model MentorInitialFeedback {
+  id              String   @id @default(cuid())
+  mentorId        String
+  mentor          User     @relation("MentorGiven", fields: [mentorId], references: [id])
+  employeeId      String   @unique
+  employee        User     @relation("EmployeeReceived", fields: [employeeId], references: [id])
+  strengths       String
+  skillGaps       String
+  softSkills      String[]
+  techPriorities  String
+  readinessRating Int
+  submittedAt     DateTime @default(now())
+}
+
+model LearningPath {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id])
+  stages      Stage[]
+  generatedAt DateTime @default(now())
+}
+
+model Stage {
+  id             String       @id @default(cuid())
+  learningPathId String
+  learningPath   LearningPath @relation(fields: [learningPathId], references: [id])
+  title          String
+  duration       String
+  order          Int
+  resources      Resource[]
+}
+
+model Resource {
+  id            String         @id @default(cuid())
+  stageId       String
+  stage         Stage          @relation(fields: [stageId], references: [id])
+  title         String
+  type          String
+  platform      String
+  url           String?
+  rationale     String
+  priority      Int
+  addedByMentor Boolean        @default(false)
+  status        ResourceStatus @default(PENDING)
+}
+
+enum ResourceStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+model QuarterlyFeedback {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  submittedBy Role
+  quarter     Int
+  year        Int
+  rating      Int
+  learned     String
+  nextGoal    String
+  submittedAt DateTime @default(now())
+}
