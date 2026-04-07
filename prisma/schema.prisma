@@ -19,6 +19,8 @@ model User {
   mentorInitialFeedback MentorInitialFeedback[] @relation("MentorGiven")
   receivedFeedback      MentorInitialFeedback? @relation("EmployeeReceived")
   quarterlyFeedbacks    QuarterlyFeedback[]
+  notesByMentor         MentorNote[]           @relation("NotesByMentor")
+  notesForEmployee      MentorNote[]           @relation("NotesForEmployee")
 }
 
 enum Role {
@@ -110,4 +112,14 @@ model QuarterlyFeedback {
   learned     String
   nextGoal    String
   submittedAt DateTime @default(now())
+}
+
+model MentorNote {
+  id         String   @id @default(cuid())
+  mentorId   String
+  mentor     User     @relation("NotesByMentor", fields: [mentorId], references: [id])
+  employeeId String
+  employee   User     @relation("NotesForEmployee", fields: [employeeId], references: [id])
+  note       String
+  createdAt  DateTime @default(now())
 }

@@ -3,6 +3,9 @@ import { redirect, notFound } from "next/navigation"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import FeedbackForm from "@/components/mentor/FeedbackForm"
+import { MentorLearningPathView } from "@/components/mentor/MentorLearningPathView"
+import { CourseManager } from "@/components/mentor/CourseManager"
+import { MentorNotes } from "@/components/mentor/MentorNotes"
 import { CheckCircle2, Clock } from "lucide-react"
 
 interface SkillEntry {
@@ -30,6 +33,21 @@ export default async function EmployeeProfilePage({
     include: {
       questionnaire: true,
       receivedFeedback: true,
+      learningPath: {
+        include: {
+          stages: {
+            orderBy: { order: "asc" },
+            include: {
+              resources: {
+                orderBy: { priority: "asc" },
+              },
+            },
+          },
+        },
+      },
+      notesForEmployee: {
+        orderBy: { createdAt: "desc" },
+      },
     },
   })
 
@@ -38,21 +56,19 @@ export default async function EmployeeProfilePage({
 
   const q = employee.questionnaire
   const feedback = employee.receivedFeedback
+  const learningPath = employee.learningPath
+  const notes = employee.notesForEmployee
 
   const skills = (q?.skills ?? []) as unknown as SkillEntry[]
+  const isGenerated = q?.status === "GENERATED"
 
   return (
     <div className="p-8 max-w-3xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <button
-          onClick={undefined}
-          className="text-sm text-zinc-400 hover:text-zinc-600 mb-4 inline-flex items-center gap-1"
-        >
-          <a href="/mentor" className="text-sm text-zinc-400 hover:text-indigo-600 transition-colors">
-            ← Back to My Team
-          </a>
-        </button>
+        <a href="/mentor" className="text-sm text-zinc-400 hover:text-indigo-600 transition-colors mb-4 inline-block">
+          ← Back to My Team
+        </a>
         <h1 className="text-2xl font-semibold text-zinc-900">{employee.name}</h1>
       </div>
 
@@ -168,6 +184,47 @@ export default async function EmployeeProfilePage({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Section 3 — Learning Path View (only if GENERATED) */}
+      {isGenerated && learningPath && (
+        <MentorLearningPathView
+          learningPath={{
+            goal: learningPath.goal,
+            generatedAt: learningPath.generatedAt,
+            stages: learningPath.stages,
+          }}
+        />
+      )}
+
+      {/* Section 4 — Course Management (only if GENERATED) */}
+      {isGenerated && learningPath && (
+        <CourseManager
+          employeeId={employeeId}
+          stages={learningPath.stages.map(s => ({
+            id: s.id,
+            title: s.title,
+            order: s.order,
+            resources: s.resources.map(r => ({
+              id: r.id,
+              title: r.title,
+              addedByMentor: r.addedByMentor,
+              stageId: r.stageId,
+            })),
+          }))}
+        />
+      )}
+
+      {/* Section 5 — Mentor Notes (always visible) */}
+      {q && (
+        <MentorNotes
+          employeeId={employeeId}
+          initialNotes={notes.map(n => ({
+            id: n.id,
+            note: n.note,
+            createdAt: n.createdAt,
+          }))}
+        />
       )}
     </div>
   )

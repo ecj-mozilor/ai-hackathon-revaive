@@ -31,3 +31,33 @@ export const mentorFeedbackSchema = z.object({
 })
 
 export type MentorFeedbackFormData = z.infer<typeof mentorFeedbackSchema>
+
+export const promoteCourseSchema = z.object({
+  action: z.literal("promote"),
+  resourceId: z.string().cuid(),
+  employeeId: z.string().cuid()
+})
+
+export const addCourseSchema = z.object({
+  action: z.literal("add"),
+  employeeId: z.string().cuid(),
+  stageId: z.string().cuid(),
+  title: z.string().min(3, "Title must be at least 3 characters"),
+  platform: z.string().min(2, "Platform is required"),
+  type: z.enum(["Video", "Article", "Course", "Book", "Project"]),
+  url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  rationale: z.string().min(10, "Please provide a rationale of at least 10 characters")
+})
+
+export const mentorNoteSchema = z.object({
+  employeeId: z.string().cuid(),
+  note: z.string().min(1, "Note cannot be empty")
+})
+
+export const courseActionSchema = z.discriminatedUnion("action", [
+  promoteCourseSchema,
+  addCourseSchema
+])
+
+export type AddCourseFormData = z.infer<typeof addCourseSchema>
+export type MentorNoteFormData = z.infer<typeof mentorNoteSchema>
