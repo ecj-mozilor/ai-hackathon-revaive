@@ -27,7 +27,7 @@ export default async function EmployeeDashboard() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold text-zinc-900">
-          Welcome back, {session.user.name.split(" ")[0]} 👋
+          Welcome, {session.user.name.split(" ")[0]} 👋
         </h1>
         <p className="text-zinc-500 text-sm mt-1">Here&apos;s your profile overview.</p>
       </div>
