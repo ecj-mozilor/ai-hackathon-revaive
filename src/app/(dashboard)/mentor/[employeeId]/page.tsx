@@ -179,19 +179,6 @@ export default async function EmployeeProfilePage({
                 <p className="text-zinc-600 whitespace-pre-wrap">{feedback.techPriorities}</p>
               </div>
             )}
-            <div>
-              <p className="font-medium text-zinc-700 mb-1">Readiness Rating</p>
-              <div className="flex gap-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <span
-                    key={i}
-                    className={`text-xl ${i < feedback.readinessRating ? "text-amber-400" : "text-zinc-200"}`}
-                  >
-                    ★
-                  </span>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       )}

@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
         skillGaps: parsed.data.skillGaps,
         softSkills: parsed.data.softSkills,
         techPriorities: parsed.data.techPriorities ?? "",
-        readinessRating: parsed.data.readinessRating
+        readinessRating: 3
       }
     }),
     prisma.questionnaireResponse.update({

@@ -18,7 +18,6 @@ const employeeLinks = [
 ]
 
 const mentorLinks = [
-  { href: "/mentor", label: "Dashboard", icon: LayoutDashboard },
   { href: "/mentor", label: "My Team", icon: Users },
   { href: "/mentor/feedback", label: "Feedback", icon: MessageSquare },
 ]
@@ -30,7 +29,7 @@ export default function Sidebar({ user }: SidebarProps) {
   return (
     <aside className="w-60 bg-zinc-900 flex flex-col sticky top-0 h-screen">
       <div className="px-5 py-6">
-        <span className="text-xl font-bold text-indigo-400 tracking-tight">SkillPath</span>
+        <span className="text-xl font-bold text-indigo-400 tracking-tight">FutureYou</span>
       </div>
 
       <nav className="flex-1 px-3 space-y-1">

@@ -1,12 +1,11 @@
 "use client"
 
-import { useForm, Controller } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
-import { StarRating } from "@/components/shared/StarRating"
 import { mentorFeedbackSchema, MentorFeedbackFormData } from "@/lib/validations"
 
 const SOFT_SKILLS = [
@@ -29,7 +28,6 @@ export default function FeedbackForm({ employeeId }: FeedbackFormProps) {
 
   const {
     register,
-    control,
     handleSubmit,
     watch,
     setValue,
@@ -42,7 +40,6 @@ export default function FeedbackForm({ employeeId }: FeedbackFormProps) {
       skillGaps: "",
       softSkills: [],
       techPriorities: "",
-      readinessRating: 0,
     },
   })
 
@@ -145,22 +142,6 @@ export default function FeedbackForm({ employeeId }: FeedbackFormProps) {
             />
           </div>
 
-          {/* Readiness Rating */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-700">
-              Readiness for Stated Goal
-            </label>
-            <Controller
-              control={control}
-              name="readinessRating"
-              render={({ field }) => (
-                <StarRating value={field.value} onChange={field.onChange} />
-              )}
-            />
-            {errors.readinessRating && (
-              <p className="text-xs text-red-500">{errors.readinessRating.message}</p>
-            )}
-          </div>
         </div>
 
         <div className="px-6 py-4 border-t border-zinc-100 bg-zinc-50">
