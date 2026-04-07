@@ -2,9 +2,10 @@ import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { Progress, ProgressTrack, ProgressIndicator } from "@/components/ui/progress"
-import { CourseCard } from "@/components/employee/CourseCard"
-import { calcOverallProgress, calcStageProgress } from "@/lib/utils"
+import { formatDate } from "@/lib/utils"
+import { LearningPathHeader } from "@/components/employee/LearningPathHeader"
+import { StageCard } from "@/components/employee/StageCard"
+import Link from "next/link"
 
 export default async function LearningPathPage() {
   const session = await getServerSession(authOptions)
@@ -24,72 +25,48 @@ export default async function LearningPathPage() {
 
   if (!learningPath) redirect("/employee")
 
-  const overallProgress = calcOverallProgress(learningPath.stages)
-  const generatedDate = new Intl.DateTimeFormat("en-GB", {
-    day: "numeric", month: "short", year: "numeric"
-  }).format(new Date(learningPath.generatedAt))
+  const allResources = learningPath.stages.flatMap(s => s.resources)
+  const allResourceIds = allResources.map(r => r.id)
+  const initialCompleted = allResources.filter(r => r.status === "COMPLETED").map(r => r.id)
+  const overallPct = allResourceIds.length
+    ? Math.round((initialCompleted.length / allResourceIds.length) * 100)
+    : 0
 
   return (
     <div className="p-8 max-w-3xl mx-auto space-y-6">
-      <h1 className="text-2xl font-semibold text-zinc-900">My Learning Path</h1>
+      <a href="/employee" className="text-sm text-zinc-400 hover:text-indigo-600 transition-colors inline-block mb-2">
+        ← Back to Dashboard
+      </a>
 
-      {/* Goal banner */}
-      <div className="rounded-xl bg-indigo-600 p-6 text-white">
-        <p className="text-xs font-medium text-indigo-200 uppercase tracking-wide mb-1">Your goal</p>
-        <p className="text-lg font-semibold mb-4">🎯 {learningPath.goal}</p>
-        <div className="flex items-center justify-between gap-4 text-sm text-indigo-200 mb-2">
-          <span>Generated on {generatedDate}</span>
-          <span>Overall Progress: {overallProgress}%</span>
+      {/* Celebration banner */}
+      {overallPct === 100 && (
+        <div className="rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-5">
+          <p className="text-lg font-semibold mb-1">🏆 You&apos;ve completed your learning path!</p>
+          <p className="text-sm text-emerald-100 mb-4">
+            Fantastic work this quarter. Head to the Feedback section to reflect on your journey.
+          </p>
+          <Link
+            href="/employee/feedback"
+            className="inline-flex items-center rounded-lg bg-white px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50 transition-colors"
+          >
+            Submit Quarterly Feedback →
+          </Link>
         </div>
-        <Progress value={overallProgress} className="gap-0">
-          <ProgressTrack className="h-2 w-full rounded-full bg-indigo-400/40">
-            <ProgressIndicator className="h-full rounded-full bg-white transition-all" />
-          </ProgressTrack>
-        </Progress>
-      </div>
+      )}
+
+      {/* Header with live overall progress */}
+      <LearningPathHeader
+        goal={learningPath.goal}
+        generatedAt={formatDate(learningPath.generatedAt)}
+        allResourceIds={allResourceIds}
+        initialCompleted={initialCompleted}
+      />
 
       {/* Stages */}
-      <div className="space-y-6">
-        {learningPath.stages.map((stage, idx) => {
-          const stageProgress = calcStageProgress(stage.resources)
-          const completedCount = stage.resources.filter(r => r.status === "COMPLETED").length
-
-          return (
-            <div key={stage.id} className="space-y-3">
-              {/* Stage header */}
-              <div className="flex items-center gap-3">
-                <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">
-                  {idx + 1}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h2 className="font-semibold text-zinc-900">{stage.title}</h2>
-                    <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600">
-                      {stage.duration}
-                    </span>
-                  </div>
-                  <p className="text-xs text-zinc-500 mt-0.5">
-                    {completedCount} of {stage.resources.length} completed
-                  </p>
-                </div>
-              </div>
-
-              {/* Stage progress bar */}
-              <Progress value={stageProgress} className="gap-0">
-                <ProgressTrack className="h-1.5 w-full rounded-full bg-zinc-200">
-                  <ProgressIndicator className="h-full rounded-full bg-emerald-500 transition-all" />
-                </ProgressTrack>
-              </Progress>
-
-              {/* Resources */}
-              <div className="space-y-3 pl-10">
-                {stage.resources.map(resource => (
-                  <CourseCard key={resource.id} resource={resource} />
-                ))}
-              </div>
-            </div>
-          )
-        })}
+      <div className="space-y-8">
+        {learningPath.stages.map((stage, idx) => (
+          <StageCard key={stage.id} stage={stage} index={idx} />
+        ))}
       </div>
     </div>
   )

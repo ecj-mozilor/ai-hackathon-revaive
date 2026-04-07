@@ -1,9 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { ExternalLink } from "lucide-react"
+import { ExternalLink, PlayCircle, CheckCircle2 } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+import { useProgressStore } from "@/store/progressStore"
 
 interface CourseCardProps {
   resource: {
@@ -22,6 +23,7 @@ interface CourseCardProps {
 export function CourseCard({ resource }: CourseCardProps) {
   const [status, setStatus] = useState(resource.status)
   const [updating, setUpdating] = useState(false)
+  const markComplete = useProgressStore(s => s.markComplete)
 
   async function updateStatus(newStatus: string) {
     const prev = status
@@ -37,6 +39,8 @@ export function CourseCard({ resource }: CourseCardProps) {
       if (!res.ok || !data.success) {
         setStatus(prev) // revert
         toast.error(data.error ?? "Failed to update status")
+      } else if (newStatus === "COMPLETED") {
+        markComplete(resource.id)
       }
     } catch {
       setStatus(prev)
@@ -54,7 +58,7 @@ export function CourseCard({ resource }: CourseCardProps) {
       className={cn(
         "rounded-xl border bg-white p-4 flex flex-col gap-3 transition-opacity",
         resource.addedByMentor ? "border-l-4 border-l-violet-500 border-r border-t border-b border-zinc-200" : "border-zinc-200",
-        isCompleted && "opacity-75"
+        isCompleted && "opacity-60 bg-zinc-50"
       )}
     >
       {/* Top row */}
@@ -73,7 +77,6 @@ export function CourseCard({ resource }: CourseCardProps) {
           </span>
         </div>
 
-        {/* Status badge */}
         {isInProgress && (
           <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
             In Progress
@@ -81,14 +84,16 @@ export function CourseCard({ resource }: CourseCardProps) {
         )}
         {isCompleted && (
           <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
-            Completed ✓
+            <CheckCircle2 className="inline size-3 mr-0.5" />Completed
           </span>
         )}
       </div>
 
       {/* Title + rationale */}
       <div>
-        <p className="font-medium text-zinc-900 text-sm">{resource.title}</p>
+        <p className={cn("font-medium text-sm", isCompleted ? "line-through text-zinc-400" : "text-zinc-900")}>
+          {resource.title}
+        </p>
         <p className="text-xs text-zinc-500 italic mt-0.5">&ldquo;{resource.rationale}&rdquo;</p>
       </div>
 
@@ -112,8 +117,9 @@ export function CourseCard({ resource }: CourseCardProps) {
               type="button"
               onClick={() => updateStatus("IN_PROGRESS")}
               disabled={updating}
-              className="inline-flex items-center rounded-lg border border-indigo-300 px-3 py-1 text-xs font-medium text-indigo-600 hover:bg-indigo-50 transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-1 rounded-lg border border-indigo-300 px-3 py-1 text-xs font-medium text-indigo-600 hover:bg-indigo-50 transition-colors disabled:opacity-50"
             >
+              <PlayCircle className="size-3" />
               Start
             </button>
           )}
@@ -123,8 +129,9 @@ export function CourseCard({ resource }: CourseCardProps) {
               type="button"
               onClick={() => updateStatus("COMPLETED")}
               disabled={updating}
-              className="inline-flex items-center rounded-lg bg-indigo-600 px-3 py-1 text-xs font-medium text-white hover:bg-indigo-700 transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-1 text-xs font-medium text-white hover:bg-indigo-700 transition-colors disabled:opacity-50"
             >
+              <CheckCircle2 className="size-3" />
               Mark Complete
             </button>
           )}

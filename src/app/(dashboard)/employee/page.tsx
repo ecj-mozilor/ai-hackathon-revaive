@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
-import { Clock, Sparkles } from "lucide-react"
+import { Clock, Sparkles, Rocket } from "lucide-react"
 import { GeneratePathButton } from "@/components/employee/GeneratePathButton"
 
 export default async function EmployeeDashboard() {
@@ -33,50 +33,53 @@ export default async function EmployeeDashboard() {
       </h1>
       <p className="text-zinc-500 mb-8">Here&apos;s where you are on your learning journey.</p>
 
+      {/* No questionnaire — Welcome screen */}
       {!q && (
-        <div className="bg-white rounded-xl shadow-sm p-8 border border-zinc-200">
-          <h2 className="text-lg font-semibold text-zinc-900 mb-2">Get started</h2>
-          <p className="text-zinc-500 mb-6">
-            Complete your onboarding questionnaire so we can build a personalised learning path for you.
+        <div className="bg-white rounded-xl shadow-sm p-8 border-2 border-dashed border-zinc-200 flex flex-col items-center text-center">
+          <Rocket className="h-10 w-10 text-indigo-500 mb-4" />
+          <h2 className="text-xl font-semibold text-zinc-900 mb-2">Welcome to SkillPath</h2>
+          <p className="text-zinc-500 mb-6 max-w-sm">
+            Let&apos;s build your personalised learning path. Start by telling us about your skills and career goals — it only takes 5 minutes.
           </p>
           <Link
             href="/employee/questionnaire"
-            className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+            className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
           >
-            Get Started
+            Get Started →
           </Link>
         </div>
       )}
 
+      {/* AWAITING_MENTOR — Waiting screen */}
       {q?.status === "AWAITING_MENTOR" && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-8 flex gap-4">
+        <div className="bg-white rounded-xl shadow-sm p-8 border border-zinc-200 border-l-4 border-l-amber-400 flex gap-4">
           <Clock className="size-6 text-amber-500 shrink-0 mt-0.5" />
           <div>
-            <h2 className="text-base font-semibold text-amber-900 mb-1">
-              Your mentor is reviewing your profile
+            <h2 className="text-base font-semibold text-zinc-900 mb-1">
+              Waiting for your mentor
             </h2>
-            <p className="text-amber-700 text-sm">
-              Hang tight! Your mentor will review your questionnaire and you&apos;ll be notified when your learning path is ready to generate.
+            <p className="text-zinc-500 text-sm mb-2">
+              Your profile is with your mentor for review. Once they submit their observations, you&apos;ll be able to generate your learning path.
             </p>
+            <p className="text-amber-600 text-sm font-medium">We&apos;ll have your path ready soon!</p>
           </div>
         </div>
       )}
 
+      {/* READY_FOR_GENERATION — Generate screen */}
       {q?.status === "READY_FOR_GENERATION" && (
-        <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-8">
-          <div className="flex gap-4">
-            <Sparkles className="size-6 text-indigo-500 shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <h2 className="text-base font-semibold text-indigo-900 mb-1">
-                Your mentor has reviewed your profile!
-              </h2>
-              <p className="text-indigo-700 text-sm mb-5">
-                {user.mentor ? `${user.mentor.name} has submitted their observations. ` : ""}
-                Click below to generate your personalised learning path powered by AI.
-              </p>
-              <GeneratePathButton />
-              <p className="mt-3 text-xs text-indigo-500">This usually takes 5–10 seconds.</p>
-            </div>
+        <div className="bg-white rounded-xl shadow-sm p-8 border border-zinc-200 border-l-4 border-l-indigo-500 flex gap-4">
+          <Sparkles className="size-6 text-indigo-500 shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <h2 className="text-base font-semibold text-zinc-900 mb-1">
+              ✨ Your mentor has reviewed your profile!
+            </h2>
+            <p className="text-zinc-500 text-sm mb-5">
+              {user.mentor ? `${user.mentor.name} has submitted their feedback. ` : ""}
+              Your personalised learning path is ready to be generated.
+            </p>
+            <GeneratePathButton />
+            <p className="mt-3 text-xs text-zinc-400">This usually takes 5–10 seconds.</p>
           </div>
         </div>
       )}

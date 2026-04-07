@@ -17,3 +17,9 @@ export function calcOverallProgress(stages: { resources: { status: string }[] }[
   const completed = all.filter(r => r.status === "COMPLETED").length
   return Math.round((completed / all.length) * 100)
 }
+
+export function formatDate(date: Date | string) {
+  return new Date(date).toLocaleDateString("en-IN", {
+    day: "numeric", month: "short", year: "numeric"
+  })
+}
