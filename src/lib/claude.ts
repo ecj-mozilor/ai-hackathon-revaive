@@ -38,7 +38,7 @@ Return ONLY this JSON shape:
       "title": string,
       "type": "Video|Article|Course|Book|Project",
       "platform": string,
-      "url": string|null,
+      "url": string,
       "rationale": string,
       "priority": number
     }]
@@ -47,7 +47,9 @@ Return ONLY this JSON shape:
 Rules:
 - Generate 2–4 stages, each with 3–5 resources
 - Mentor-identified gaps must be prominently reflected
-- Resources must be realistic and on well-known platforms`
+- Resources must be realistic and on well-known platforms
+- Every resource MUST have a url — never leave it null or empty
+- Use the direct course or article page URL if you know it; otherwise use the platform homepage (e.g. https://www.youtube.com, https://www.udemy.com, https://www.coursera.org)`
     }]
   })
 
