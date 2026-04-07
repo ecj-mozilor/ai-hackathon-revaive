@@ -23,3 +23,13 @@ export function formatDate(date: Date | string) {
     day: "numeric", month: "short", year: "numeric"
   })
 }
+
+export function getCurrentQuarter(): { quarter: number; year: number } {
+  const now = new Date()
+  const quarter = Math.floor(now.getMonth() / 3) + 1
+  return { quarter, year: now.getFullYear() }
+}
+
+export function getQuarterLabel(quarter: number, year: number) {
+  return `Q${quarter} ${year}`
+}

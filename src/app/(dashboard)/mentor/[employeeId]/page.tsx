@@ -6,6 +6,7 @@ import FeedbackForm from "@/components/mentor/FeedbackForm"
 import { MentorLearningPathView } from "@/components/mentor/MentorLearningPathView"
 import { CourseManager } from "@/components/mentor/CourseManager"
 import { MentorNotes } from "@/components/mentor/MentorNotes"
+import { FeedbackSummaryCard } from "@/components/shared/FeedbackSummaryCard"
 import { CheckCircle2, Clock } from "lucide-react"
 
 interface SkillEntry {
@@ -28,28 +29,34 @@ export default async function EmployeeProfilePage({
   const session = await getServerSession(authOptions)
   if (!session || session.user.role !== "MENTOR") redirect("/login")
 
-  const employee = await prisma.user.findUnique({
-    where: { id: employeeId },
-    include: {
-      questionnaire: true,
-      receivedFeedback: true,
-      learningPath: {
-        include: {
-          stages: {
-            orderBy: { order: "asc" },
-            include: {
-              resources: {
-                orderBy: { priority: "asc" },
+  const [employee, quarterlyFeedbacks] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: employeeId },
+      include: {
+        questionnaire: true,
+        receivedFeedback: true,
+        learningPath: {
+          include: {
+            stages: {
+              orderBy: { order: "asc" },
+              include: {
+                resources: {
+                  orderBy: { priority: "asc" },
+                },
               },
             },
           },
         },
+        notesForEmployee: {
+          orderBy: { createdAt: "desc" },
+        },
       },
-      notesForEmployee: {
-        orderBy: { createdAt: "desc" },
-      },
-    },
-  })
+    }),
+    prisma.quarterlyFeedback.findMany({
+      where: { userId: employeeId },
+      orderBy: [{ year: "desc" }, { quarter: "desc" }],
+    }),
+  ])
 
   if (!employee) notFound()
   if (employee.mentorId !== session.user.id) redirect("/mentor")
@@ -61,6 +68,9 @@ export default async function EmployeeProfilePage({
 
   const skills = (q?.skills ?? []) as unknown as SkillEntry[]
   const isGenerated = q?.status === "GENERATED"
+
+  const employeeFeedbacks = quarterlyFeedbacks.filter(f => f.submittedBy === "EMPLOYEE")
+  const mentorFeedbacks = quarterlyFeedbacks.filter(f => f.submittedBy === "MENTOR")
 
   return (
     <div className="p-8 max-w-3xl mx-auto space-y-6">
@@ -225,6 +235,59 @@ export default async function EmployeeProfilePage({
             createdAt: n.createdAt,
           }))}
         />
+      )}
+
+      {/* Section 6 — Quarterly Feedback History */}
+      {quarterlyFeedbacks.length > 0 && (
+        <div className="bg-white rounded-xl border border-zinc-200 shadow-sm p-6 space-y-4">
+          <h2 className="text-base font-semibold text-zinc-900">Quarterly Feedback History</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Employee reflections */}
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Employee Reflections</p>
+              {employeeFeedbacks.length === 0 ? (
+                <p className="text-sm text-zinc-400">No employee feedback submitted yet.</p>
+              ) : (
+                employeeFeedbacks.map(f => (
+                  <FeedbackSummaryCard
+                    key={f.id}
+                    quarter={f.quarter}
+                    year={f.year}
+                    rating={f.rating}
+                    learned={f.learned}
+                    nextGoal={f.nextGoal}
+                    submittedBy="EMPLOYEE"
+                    collapsible
+                    defaultOpen={false}
+                  />
+                ))
+              )}
+            </div>
+
+            {/* Mentor feedback */}
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Your Feedback</p>
+              {mentorFeedbacks.length === 0 ? (
+                <p className="text-sm text-zinc-400">No mentor feedback submitted yet.</p>
+              ) : (
+                mentorFeedbacks.map(f => (
+                  <FeedbackSummaryCard
+                    key={f.id}
+                    quarter={f.quarter}
+                    year={f.year}
+                    rating={f.rating}
+                    learned={f.learned}
+                    nextGoal={f.nextGoal}
+                    submittedBy="MENTOR"
+                    subjectName={employee.name}
+                    collapsible
+                    defaultOpen={false}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

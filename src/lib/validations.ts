@@ -61,3 +61,19 @@ export const courseActionSchema = z.discriminatedUnion("action", [
 
 export type AddCourseFormData = z.infer<typeof addCourseSchema>
 export type MentorNoteFormData = z.infer<typeof mentorNoteSchema>
+
+export const employeeFeedbackSchema = z.object({
+  rating: z.coerce.number().min(1, "Please provide a rating").max(5),
+  learned: z.string().min(30, "Please write at least 30 characters"),
+  nextGoal: z.string().min(20, "Please write at least 20 characters")
+})
+
+export const mentorQuarterlySchema = z.object({
+  targetUserId: z.string().cuid(),
+  rating: z.coerce.number().min(1, "Please provide a rating").max(5),
+  learned: z.string().min(30, "Please write at least 30 characters"),
+  nextGoal: z.string().min(20, "Please write at least 20 characters")
+})
+
+export type EmployeeFeedbackFormData = z.infer<typeof employeeFeedbackSchema>
+export type MentorQuarterlyFormData = z.infer<typeof mentorQuarterlySchema>
