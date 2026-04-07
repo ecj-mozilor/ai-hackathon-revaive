@@ -64,6 +64,7 @@ model LearningPath {
   id          String   @id @default(cuid())
   userId      String   @unique
   user        User     @relation(fields: [userId], references: [id])
+  goal        String   @default("")
   stages      Stage[]
   generatedAt DateTime @default(now())
 }

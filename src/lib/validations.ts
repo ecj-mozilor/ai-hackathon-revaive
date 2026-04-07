@@ -20,3 +20,14 @@ export const questionnaireSchema = z.object({
 })
 
 export type QuestionnaireFormData = z.infer<typeof questionnaireSchema>
+
+export const mentorFeedbackSchema = z.object({
+  employeeId: z.string().cuid(),
+  strengths: z.string().min(20, "Please provide at least 20 characters"),
+  skillGaps: z.string().min(20, "Please provide at least 20 characters"),
+  softSkills: z.array(z.string()).min(1, "Select at least one soft skill"),
+  techPriorities: z.string().optional(),
+  readinessRating: z.coerce.number().min(1).max(5)
+})
+
+export type MentorFeedbackFormData = z.infer<typeof mentorFeedbackSchema>
