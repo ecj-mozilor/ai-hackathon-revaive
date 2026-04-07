@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth"
+import { Prisma } from "@prisma/client"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { generateLearningPath } from "@/lib/claude"
@@ -38,10 +39,9 @@ export async function POST(req: NextRequest) {
 
   try {
     const learningPath = await prisma.$transaction(async (tx) => {
-      const path = await tx.learningPath.create({
+      await tx.learningPath.create({
         data: {
           userId,
-          goal: aiResult.goal,
           stages: {
             create: aiResult.stages.map((s: any) => ({
               title: s.title,
@@ -61,7 +61,15 @@ export async function POST(req: NextRequest) {
               }
             }))
           }
-        },
+        }
+      })
+
+      await tx.$executeRaw(
+        Prisma.sql`UPDATE "LearningPath" SET "goal" = ${aiResult.goal} WHERE "userId" = ${userId}`
+      )
+
+      const path = await tx.learningPath.findUniqueOrThrow({
+        where: { userId },
         include: {
           stages: { include: { resources: true }, orderBy: { order: "asc" } }
         }

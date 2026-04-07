@@ -47,25 +47,7 @@ Return ONLY this JSON shape:
 Rules:
 - Generate 2–4 stages, each with 3–5 resources
 - Mentor-identified gaps must be prominently reflected
-- Resources must be realistic and on well-known platforms
-
-URL RULES — follow strictly:
-- Only provide a url if you are highly confident the exact page exists
-- Prefer linking to stable, well-known pages: platform homepages, course category pages, or search result pages — not specific course slugs
-- Use these safe URL patterns by platform:
-  * YouTube: https://www.youtube.com/results?search_query={course+title}
-  * Coursera: https://www.coursera.org/search?query={course+title}
-  * Udemy: https://www.udemy.com/courses/search/?q={course+title}
-  * freeCodeCamp: https://www.freecodecamp.org
-  * MDN: https://developer.mozilla.org
-  * Frontend Masters: https://frontendmasters.com/courses/
-  * Reforge: https://www.reforge.com/courses
-  * LinkedIn Learning: https://www.linkedin.com/learning/search?keywords={course+title}
-  * roadmap.sh: https://roadmap.sh
-  * For any other platform: set url to null rather than guessing
-- Replace spaces with + in search query URLs
-- Never invent or guess a specific course slug URL
-- If unsure, always set url to null`
+- Resources must be realistic and on well-known platforms`
     }]
   })
 
